@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weatherdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./weather-backend
+    container_name: weather-backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./weather-backend/.env
+    depends_on:
+      - db
+
+  frontend:
+    build: ./weather-frontend
+    container_name: weather-frontend
+    ports:
+      - "5173:80"
+    env_file:
+      - ./weather-frontend/.env
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
